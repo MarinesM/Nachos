@@ -15,6 +15,8 @@
 int
 main()
 {
+    char *test = "Test.txt";
+    open(test);
     halt();
     /* not reached */
 }

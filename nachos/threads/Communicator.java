@@ -14,12 +14,10 @@ public class Communicator {
      * Allocate a new communicator.
      */
     public Communicator() {
-        //Variables nuevas
         communicationLock = new Lock();
 		    currentSpeaker = new Condition2(communicationLock);
 		    currentListener = new Condition2(communicationLock);
 		    newMsg = false;
-
     }
 
     /**
@@ -33,23 +31,20 @@ public class Communicator {
      * @param	word	the integer to transfer.
      */
     public void speak(int currentMsg) {
-      communicationLock.acquire();
-      speaker += 1;
-      //System.out.println("Speakers: " + speaker);
-      //Esperar hasta que por lo menos un listener este disponible
-      while (listener < 1 || newMsg == true){
-        this.currentSpeaker.sleep();
-      }
-
-      //Transmite mensaje
-      this.msg = currentMsg;
-      //Confirma que existe un mensaje disponible
-      newMsg = true;
-      currentListener.wake();
-      speaker -= 1;
-
-      communicationLock.release();
-
+        communicationLock.acquire();
+        speaker += 1;
+        //System.out.println("Speakers: " + speaker);
+        //Esperar hasta que por lo menos un listener este disponible
+        while (listener < 1 || newMsg == true){
+          this.currentSpeaker.sleep();
+        }
+        //Transmite mensaje
+        this.msg = currentMsg;
+        //Confirma que existe un mensaje disponible
+        newMsg = true;
+        currentListener.wake();
+        speaker -= 1;
+        communicationLock.release();
     }
 
     /**
@@ -61,26 +56,23 @@ public class Communicator {
 
 
     public int listen() {
-
-      int currentMsg;
-    	communicationLock.acquire();
-    	listener += 1;
-      //System.out.println("Listeners: " + listener);
-      //Esperar a que un mensaje este disponible
-    	while (newMsg == false){
-    		currentSpeaker.wake();
-    		this.currentListener.sleep();
-    	}
-
-    	currentMsg = this.msg;
-      // Ya se transmitio el mensaje
-    	newMsg = false;
-    	listener -= 1;
-      currentSpeaker.wake();
-    	communicationLock.release();
-      // Devuelve el mensaje que escucho
-    	return currentMsg;
-
+        int currentMsg;
+      	communicationLock.acquire();
+      	listener += 1;
+        //System.out.println("Listeners: " + listener);
+        //Esperar a que un mensaje este disponible
+      	while (newMsg == false){
+      		currentSpeaker.wake();
+      		this.currentListener.sleep();
+      	}
+      	currentMsg = this.msg;
+        // Ya se transmitio el mensaje
+      	newMsg = false;
+      	listener -= 1;
+        currentSpeaker.wake();
+      	communicationLock.release();
+        // Devuelve el mensaje que escucho
+      	return currentMsg;
     }
 
     private Lock communicationLock;

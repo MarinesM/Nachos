@@ -15,7 +15,7 @@ public class ThreadedKernel extends Kernel {
 
     /**
      * Initialize this kernel. Creates a scheduler, the first thread, and an
-     * alarm, and enables interrupts. Creates a file system if necessary.   
+     * alarm, and enables interrupts. Creates a file system if necessary.
      */
     public void initialize(String[] args) {
 	// set scheduler
@@ -44,7 +44,7 @@ public class ThreadedKernel extends Kernel {
      * <tt>SynchList</tt>, and <tt>ElevatorBank</tt> classes. Note that the
      * autograder never calls this method, so it is safe to put additional
      * tests here.
-     */	
+     */
     public void selfTest() {
 	//KThread.selfTest();
 	//Semaphore.selfTest();
@@ -53,13 +53,13 @@ public class ThreadedKernel extends Kernel {
 	//PriorityScheduler.selfTestRun(7, 4);
 	//Communicator.selfTest();
 	//Alarm.selfTest();
-	Boat.selfTest(3,4);
+	Boat.selfTest(3,3);
 	//SynchList.selfTest();
 	if (Machine.bank() != null) {
 	    ElevatorBank.selfTest();
 	}
     }
-    
+
     /**
      * A threaded kernel does not run user programs, so this method does
      * nothing.
@@ -80,7 +80,7 @@ public class ThreadedKernel extends Kernel {
     public static Alarm alarm = null;
     /** Globally accessible reference to the file system. */
     public static FileSystem fileSystem = null;
-    
+
 
     // dummy variables to make javac smarter
     private static RoundRobinScheduler dummy1 = null;
@@ -90,6 +90,6 @@ public class ThreadedKernel extends Kernel {
     private static Communicator dummy5 = null;
     private static Rider dummy6 = null;
     private static ElevatorController dummy7 = null;
-	
+
 
 }

@@ -13,10 +13,9 @@ public class Boat
 
     	System.out.println("\n ***Testing Boats with " + c + " children and " + a + " adults***");
     	begin(a, c, b);
-
     }
 
-    public static void begin( int adults, int children, BoatGrader b )
+    public static void begin(int adults, int children, BoatGrader b)
     {
       Lib.assertTrue(children >= 2);
     	// Store the externally generated autograder in a class
@@ -27,8 +26,8 @@ public class Boat
       people = adults + children;
       maxAdults = adults;
       maxChildren = children;
-      //Todos empiezan en Oahu
       boat = new Lock();
+      //Todos empiezan en Oahu
       adultsOnOahu = adults;
       childrenOnOahu = children;
       boatLocation = "Oahu";
@@ -72,7 +71,6 @@ public class Boat
       };
 
       boat.release();
-      System.out.println("Boat finished on " + boatLocation + "!");
       System.out.println("childrenOnOahu = " + childrenOnOahu);
       System.out.println("adultsOnOahu = " + adultsOnOahu);
       System.out.println("childrenOnMolokai = " + childrenOnMolokai);
@@ -84,7 +82,7 @@ public class Boat
     {
       boat.acquire();
 
-      while (boatLocation.equals("Molokai") || childrenOnOahu != 1){
+      while (boatLocation.equals("Molokai") || childrenOnOahu < 1){
            adultOnOahu.sleep();
       }
 
@@ -94,9 +92,7 @@ public class Boat
       boatLocation = "Molokai";
       adultsOnMolokai += 1;
       childOnMolokai.wake();
-
       boat.release();
-
     }
 
     static void ChildItinerary()
@@ -110,34 +106,30 @@ public class Boat
           //bg.ChildRowToOahu();
           boatLocation = "Oahu";
           childrenOnOahu += 1;
-
         }
         //Si el barco esta en Oahu y 2 o mas ninos en Oahu
         else if (boatLocation.equals("Oahu") && childrenOnOahu >= 2) {
-          if (Passenger.equals("None")) {
-            Passenger = "onBoat";
-            //bg.ChildRideToMolokai();
-            System.out.println(KThread.currentThread().getName() + " riding to Molokai");
-            childOnOahu.wake();
-            childOnMolokai.sleep();
-          }
-          else {
-            childrenOnOahu -= 2;
-            System.out.println(KThread.currentThread().getName() + " rowing to Molokai");
-            //bg.ChildRowToMolokai();
-            Passenger = "None";
-            boatLocation = "Molokai";
-            childrenOnMolokai += 2;
-            //Validamos si ya todos estan en molokai
-            everyoneInMolokai.wake();
-          }
-        }
-        else {
+            if (Passenger.equals("None")) {
+              Passenger = "onBoat";
+              //bg.ChildRideToMolokai();
+              System.out.println(KThread.currentThread().getName() + " riding to Molokai");
+              childOnOahu.wake();
+              childOnMolokai.sleep();
+            }else {
+              childrenOnOahu -= 2;
+              System.out.println(KThread.currentThread().getName() + " rowing to Molokai");
+              //bg.ChildRowToMolokai();
+              Passenger = "None";
+              boatLocation = "Molokai";
+              childrenOnMolokai += 2;
+              //Validamos si ya todos estan en molokai
+              everyoneInMolokai.wake();
+            }
+        }else {
           adultOnOahu.wake();
           childOnOahu.sleep();
         }
       }
-
       boat.release();
     }
 

@@ -223,11 +223,8 @@ public class PriorityScheduler extends Scheduler {
         public boolean transferPriority;
         //Lista de threads que estan esperando accesar este recurso
         protected LinkedList<ThreadState> waitQueue = new LinkedList<ThreadState>();
-
          //variable tipo thread state que indica que thread es dueno actual de este recurso
         protected ThreadState resourceHolder = null;
-
-         //Priodidad mas alta que tiene entre todos sus threads
         protected int effectivePriority = priorityMinimum;
 
     }
@@ -277,7 +274,6 @@ public class PriorityScheduler extends Scheduler {
          * @param priority the new priority.
          */
         public void setPriority(int priority) {
-
             if (this.priority == priority)
                 return;
             this.priority = priority;
@@ -300,7 +296,6 @@ public class PriorityScheduler extends Scheduler {
             this.waitingOn = waitQueue;
             //Como lo estoy esperando, lo quito de la lista de lo que actualmente tengo
             this.currentResources.remove(waitQueue);
-
         }
 
         /**
@@ -314,10 +309,9 @@ public class PriorityScheduler extends Scheduler {
          * @see nachos.threads.ThreadQueue#nextThread
          */
         public void acquire(PriorityQueue waitQueue) {
-            //Agrega esta cola a sus recursos
             this.currentResources.add(waitQueue);
             //Como el thread ya lo tiene, lo quita de su lista de lo que esta esperando
-            this.waitingOn=null;
+            this.waitingOn = null;
         }
 
         /**

@@ -346,6 +346,12 @@ public class UserProcess {
 	return 0;
     }
 
+	private int handleOpen(int address){
+		System.out.println("Function Handle Open");
+		System.out.println("Memory Address: " + address);
+		System.out.println(readVirtualMemoryString(address, 256));
+		return -1;
+	}
 
     private static final int
         syscallHalt = 0,
@@ -391,6 +397,8 @@ public class UserProcess {
 	switch (syscall) {
 	case syscallHalt:
 	    return handleHalt();
+	case syscallOpen:
+	    return handleOpen(a0);
 
 
 	default:

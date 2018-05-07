@@ -31,7 +31,6 @@ public class Condition2 {
      * automatically reacquire the lock before <tt>sleep()</tt> returns.b
      */
     public void sleep() {
-
 	     Lib.assertTrue(conditionLock.isHeldByCurrentThread());
        boolean intStatus = Machine.interrupt().disable();
        //System.out.println("Going to sleep: " + KThread.currentThread().getName());
@@ -41,7 +40,6 @@ public class Condition2 {
        KThread.sleep();
        Machine.interrupt().restore(intStatus);
 	     conditionLock.acquire();
-
     }
 
     /**
@@ -50,13 +48,12 @@ public class Condition2 {
      */
     public void wake() {
     	Lib.assertTrue(conditionLock.isHeldByCurrentThread());
-
       boolean intStatus = Machine.interrupt().disable();
-      		if (!waitQueue.isEmpty()){
-            //System.out.println("Waking up: " + KThread.currentThread().getName());
-            waitQueue.removeFirst().ready();
-          }
-            Machine.interrupt().restore(intStatus);
+      if (!waitQueue.isEmpty()){
+        //System.out.println("Waking up: " + KThread.currentThread().getName());
+        waitQueue.removeFirst().ready();
+      }
+      Machine.interrupt().restore(intStatus);
     }
 
     /**
@@ -65,10 +62,9 @@ public class Condition2 {
      */
     public void wakeAll() {
 	       Lib.assertTrue(conditionLock.isHeldByCurrentThread());
-
          while (!waitQueue.isEmpty()){
-         //Mientras el waitQueue tenga elementos, despertarlos
-          wake();
+           //Mientras el waitQueue tenga elementos, despertarlos
+           wake();
         }
     }
 
