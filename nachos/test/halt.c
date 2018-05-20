@@ -31,10 +31,11 @@ main()
     */
 
     //Read
+
     void *buffer[1];
     int read1 = open(test);
     int read2 = read(read1,buffer,11);
-    printf("Contenido: %s\n",buffer);
+    printf("Contenido: %s\n", buffer);
 
     halt();
     /* not reached */

@@ -26,6 +26,8 @@ public class UserProcess {
     public UserProcess() {
 	int numPhysPages = Machine.processor().getNumPhysPages();
 	pageTable = new TranslationEntry[numPhysPages];
+  this.fdt[0] = UserKernel.console.openForReading();
+		this.fdt[1] = UserKernel.console.openForWriting();
 	for (int i=0; i<numPhysPages; i++)
 	    pageTable[i] = new TranslationEntry(i,i, true,false,false,false);
     }
@@ -366,8 +368,8 @@ public class UserProcess {
 		return -1;
 	}
 
-	private boolean validateFile(int fd){
-	    if (fd < 0 || fd > 15 || fdt[fd] == null)
+	private boolean validateFile(int fd, int size){
+	    if (fd < 0 || fd > 15 || fdt[fd] == null || size < 0)
 	    {
 	      return false;
 	    }else{
@@ -375,27 +377,32 @@ public class UserProcess {
 	    }
 	  }
 
+    private boolean validateFile(int fd){
+  	    return validateFile(fd, 1);
+
+  	  }
+
 	private int handleOpen(int address){
-		System.out.println("Function Handle Open");
-		System.out.println("Memory Address: " + address);
-		System.out.println(readVirtualMemoryString(address, 256));
+		//System.out.println("Function Handle Open");
+		//System.out.println("Memory Address: " + address);
+		//System.out.println(readVirtualMemoryString(address, 256));
 
 		String vm = readVirtualMemoryString(address, 256);
 		OpenFile fd = ThreadedKernel.fileSystem.open(vm, false);
 		int position = findValue(fd);
 		if (position != -1){
-			System.out.println("Open Succesful");
+			//System.out.println("Open Succesful");
 			return position;
 		}
 		else {
 			position = getNextValue();
 			if (position != -1){
-				System.out.println("Open Succesful");
+				//System.out.println("Open Succesful");
 				this.fdt[position] = fd;
 				return position;
 			}
 			else {
-				System.out.println("Open Failed");
+				//System.out.println("Open Failed");
 				return -1;
 			}
 
@@ -403,36 +410,36 @@ public class UserProcess {
 	}
 
 	private int handleCreate(int address){
-		System.out.println("Function Handle Create");
-		System.out.println("Memory Address: " + address);
+		//System.out.println("Function Handle Create");
+		//System.out.println("Memory Address: " + address);
 
 		String newVM = readVirtualMemoryString(address, 256);
 		OpenFile fd = ThreadedKernel.fileSystem.open(newVM, true);
 		int position = findValue(fd);
 		if (position != -1){
-			System.out.println("Create Succesful");
+			//System.out.println("Create Succesful");
 			return position;
 		}
 		else {
 			position = getNextValue();
 			if (position != -1){
-				System.out.println("Create Succesful");
+				//System.out.println("Create Succesful");
 				this.fdt[position] = fd;
 				return position;
 			}
 			else {
-				System.out.println("Create Failed");
+				//System.out.println("Create Failed");
 				return -1;
 			}
 		}
 	}
 
 	private int handleClose(int fd){
-		System.out.println("Function Handle Close");
-		System.out.println("FD : " + fd);
+		//System.out.println("Function Handle Close");
+		//System.out.println("FD : " + fd);
 
 		if (validateFile(fd) == false){
-			System.out.println("Invalid file");
+			//System.out.println("Invalid file");
 			return -1;
 		}
 
@@ -448,8 +455,8 @@ public class UserProcess {
 
 
 	private int handleUnlink(int address){
-		System.out.println("Function Handle Unlink");
-		System.out.println("Memory Address: " + address);
+		//System.out.println("Function Handle Unlink");
+		//System.out.println("Memory Address: " + address);
 
 		String newVM = readVirtualMemoryString(address, 256);
 
@@ -459,7 +466,7 @@ public class UserProcess {
 		if (correct) {
 			for (int i=0; i < this.fdt.length; i++){
 				if(this.fdt[i] != null && this.fdt[i].getName() == newVM) {
-					System.out.println("Unlinked Succesfully");
+					//System.out.println("Unlinked Succesfully");
 					this.fdt[i] = null;
 					break;
 				}
@@ -469,7 +476,7 @@ public class UserProcess {
 
 		}
 		else {
-			System.out.println("Unlink Unsuccesful");
+			//System.out.println("Unlink Unsuccesful");
 			return -1;
 		}
 
@@ -478,49 +485,43 @@ public class UserProcess {
 
 	private int handleWrite(int fd, int buffer, int size){
 	    //Validaciones
-	    if (validateFile(fd) == false){
-		System.out.println("Invalid file");
-		return -1;
+	    if (validateFile(fd, size) == false){
+    		return -1;
 	    }
-
 	    byte[] newBuffer = new byte[size];
-	    OpenFile myFile = fdt[fd];
+	    OpenFile myFile = this.fdt[fd];
 	    int writtenLength = readVirtualMemory(buffer, newBuffer);
 	    if (writtenLength != size){
 	      return -1;
 	    }
-	    if (myFile.write(newBuffer, 0, size) != size){
-	      System.out.println("Write unsuccesful");
-	      return -1;
-	    }
-	    else{
-	      System.out.println("Write operation completed");
-	      return size;
-	    }
+
+	    return myFile.write(newBuffer, 0, writtenLength);
+
 	  }
+
 
 	  private int handleRead(int fd, int buffer, int size){
 	    //Validaciones
-	    if (validateFile(fd) ==  false){
-		System.out.println("Invalid file");
-		return -1;
+	    if (validateFile(fd, size) ==  false){
+    		//System.out.println("Invalid file");
+    		return -1;
 	    }
 
 	    OpenFile myFile = this.fdt[fd];
 	    byte[] newBuffer = new byte[size];
 	    int readLength = myFile.read(newBuffer, 0, size);
 	    if (readLength < 0){
-	      System.out.println("Unable to read");
+	      //System.out.println("Unable to read");
 	      return -1;
 	    }
 
 	    int wroteMemory = writeVirtualMemory(buffer, newBuffer, 0, readLength);
 	    if (wroteMemory != readLength){
-	      System.out.println("Read unsuccesful");
+	      //System.out.println("Read unsuccesful");
 	      return -1;
 	    }
 	    else{
-	      System.out.println("Read operation completed");
+	      //System.out.println("Read operation completed");
 	      return readLength;
 	    }
 	  }
@@ -581,6 +582,8 @@ public class UserProcess {
 	      	return handleWrite(a0, a1, a2);
 	case syscallRead:
 	      	return handleRead(a0, a1, a2);
+  case syscallExit:
+          return 1;
 
 	default:
 	    Lib.debug(dbgProcess, "Unknown syscall " + syscall);
