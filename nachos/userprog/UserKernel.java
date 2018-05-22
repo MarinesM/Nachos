@@ -21,7 +21,7 @@ public class UserKernel extends ThreadedKernel {
      */
     public void initialize(String[] args) {
     	super.initialize(args);
-
+      thePages = new Lock();
     	console = new SynchConsole(Machine.console());
 
     	Machine.processor().setExceptionHandler(new Runnable() {
@@ -94,20 +94,45 @@ public class UserKernel extends ThreadedKernel {
     	super.run();
 
     	UserProcess process = UserProcess.newUserProcess();
-
+      UserProcess process2 = UserProcess.newUserProcess();
     	String shellProgram = Machine.getShellProgramName();
-    	Lib.assertTrue(process.execute(shellProgram, new String[] { }));
-
+    	//Lib.assertTrue(process.execute(shellProgram, new String[] { }));
+      Lib.assertTrue(process.execute("writeTest.coff", new String[]{}));
+      Lib.assertTrue(process2.execute("writeTest.coff", new String[]{}));
     	KThread.currentThread().finish();
     }
 
-    /**
-     * Terminate this kernel. Never returns.
-     */
-    public void terminate() {
-	super.terminate();
-    }
+      /**
+       * Terminate this kernel. Never returns.
+       */
+      public void terminate() {
+  	     super.terminate();
+      }
 
+      public static boolean[] getFreePages(){
+    		return freePages;
+    	}
+
+	public static int getNextFreePage(){
+    thePages.acquire();
+		for(int i = 0; i < freePages.length; i++){
+			if (freePages[i] == false) {
+				freePages[i] = true;
+        thePages.release();
+				return i;
+			}
+		}
+    thePages.release();
+		return -1;
+	}
+
+  public static void setFree(int i){
+    freePages[i] = false;
+  }
+
+
+	public static boolean[] freePages = new boolean[Machine.processor().getNumPhysPages()];
+  static Lock thePages;
     /** Globally accessible reference to the synchronized console. */
     public static SynchConsole console;
 

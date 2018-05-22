@@ -39,7 +39,7 @@ public final class Processor {
 
 	usingTLB =
 	    (clsVMKernel != null && clsVMKernel.isAssignableFrom(clsKernel));
-	
+
 	this.numPhysPages = numPhysPages;
 
 	for (int i=0; i<numUserRegisters; i++)
@@ -80,7 +80,7 @@ public final class Processor {
     public Runnable getExceptionHandler() {
 	return exceptionHandler;
     }
-    
+
     /**
      * Start executing instructions at the current PC. Never returns.
      */
@@ -92,7 +92,7 @@ public final class Processor {
 	Machine.autoGrader().runProcessor(privilege);
 
 	Instruction inst = new Instruction();
-	
+
 	while (true) {
 	    try {
 		inst.run();
@@ -113,7 +113,7 @@ public final class Processor {
      */
     public int readRegister(int number) {
 	Lib.assertTrue(number >= 0 && number < numUserRegisters);
-	
+
 	return registers[number];
     }
 
@@ -172,9 +172,9 @@ public final class Processor {
      * @param	pageTable	the page table to use.
      */
     public void setPageTable(TranslationEntry[] pageTable) {
-	Lib.assertTrue(!usingTLB);
+    	Lib.assertTrue(!usingTLB);
 
-	this.translations = pageTable;
+    	this.translations = pageTable;
     }
 
     /**
@@ -184,7 +184,7 @@ public final class Processor {
      */
     public int getTLBSize() {
 	Lib.assertTrue(usingTLB);
-    
+
 	return tlbSize;
     }
 
@@ -358,7 +358,7 @@ public final class Processor {
 	int paddr = (ppn*pageSize) + offset;
 
 	if (Lib.test(dbgProcessor))
-	    System.out.println("\t\tpaddr=0x" + Lib.toHexString(paddr));	
+	    System.out.println("\t\tpaddr=0x" + Lib.toHexString(paddr));
 	return paddr;
     }
 
@@ -377,17 +377,17 @@ public final class Processor {
 			       + ", size=" + size);
 
 	Lib.assertTrue(size==1 || size==2 || size==4);
-	
+
 	int value = Lib.bytesToInt(mainMemory, translate(vaddr, size, false),
 				   size);
 
 	if (Lib.test(dbgProcessor))
 	    System.out.println("\t\tvalue read=0x" +
 			       Lib.toHexString(value, size*2));
-	
+
 	return value;
     }
-    
+
     /**
      * Write <i>value</i> to </i>size</i> (1, 2, or 4) bytes of virtual memory
      * starting at <i>vaddr</i>.
@@ -405,7 +405,7 @@ public final class Processor {
 			       + Lib.toHexString(value, size*2));
 
 	Lib.assertTrue(size==1 || size==2 || size==4);
-	
+
 	Lib.bytesFromInt(mainMemory, translate(vaddr, size, true), size,
 			 value);
     }
@@ -491,7 +491,7 @@ public final class Processor {
 	"overflow     ",
 	"illegal inst "
     };
-    
+
     /** Index of return value register 0. */
     public static final int regV0 = 2;
     /** Index of return value register 1. */
@@ -526,7 +526,7 @@ public final class Processor {
 
     /** Provides privilege to this processor. */
     private Privilege privilege;
-    
+
     /** MIPS registers accessible to the kernel. */
     private int registers[] = new int[numUserRegisters];
 
@@ -599,13 +599,13 @@ public final class Processor {
 	    // autograder might not want kernel to know about this exception
 	    if (!Machine.autoGrader().exceptionHandler(privilege))
 		return;
-	    
+
 	    exceptionHandler.run();
 	}
 
 	private boolean hasBadVAddr = false;
 	private int cause, badVAddr;
-    }	
+    }
 
     private class Instruction {
 	public void run() throws MipsException {
@@ -614,7 +614,7 @@ public final class Processor {
 	    decode();
 	    execute();
 	    writeBack();
-	}	
+	}
 
 	private boolean test(int flag) {
 	    return Lib.test(flag, flags);
@@ -628,7 +628,7 @@ public final class Processor {
 
 	    value = readMem(registers[regPC], 4);
 	}
-	
+
 	private void decode() {
 	    op = Lib.extract(value, 26, 6);
 	    rs = Lib.extract(value, 21, 5);
@@ -657,9 +657,9 @@ public final class Processor {
 	    format = info.format;
 	    flags = info.flags;
 
-	    mask = 0xFFFFFFFF;	
+	    mask = 0xFFFFFFFF;
 	    branch = true;
-	
+
 	    // get memory access size
 	    if (test(Mips.SIZEB))
 		size = 1;
@@ -716,10 +716,10 @@ public final class Processor {
 	    if (test(Mips.UNSIGNED)) {
 		src1 &= 0xFFFFFFFFL;
 		src2 &= 0xFFFFFFFFL;
-	    }	    
+	    }
 
 	    if (Lib.test(dbgDisassemble) || Lib.test(dbgFullDisassemble))
-		print();	    
+		print();
 	}
 
 	private void print() {
@@ -727,7 +727,7 @@ public final class Processor {
 		!Lib.test(dbgFullDisassemble))
 		System.out.print("PC=0x" + Lib.toHexString(registers[regPC])
 				 + "\t");
-	    
+
 	    if (operation == Mips.INVALID) {
 		System.out.print("invalid: op=" + Lib.toHexString(op, 2) +
 				 " rs=" + Lib.toHexString(rs, 2) +
@@ -755,7 +755,7 @@ public final class Processor {
 		    System.out.print("$" + rs);
 		    minCharsPrinted += 2;
 		    maxCharsPrinted += 3;
-		    
+
 		    if (Lib.test(dbgFullDisassemble)) {
 			System.out.print("#0x" +
 					 Lib.toHexString(registers[rs]));
@@ -806,7 +806,7 @@ public final class Processor {
 			minCharsPrinted += 11;
 			maxCharsPrinted += 11;
 		    }
-		    
+
 		    System.out.print(")");
 		    break;
 		case Mips.TARGET:
@@ -815,7 +815,7 @@ public final class Processor {
 		    maxCharsPrinted += 10;
 		    break;
 		default:
-		    Lib.assertTrue(false);    
+		    Lib.assertTrue(false);
 		}
 		if (i+1 < args.length) {
 		    System.out.print(", ");
@@ -848,7 +848,7 @@ public final class Processor {
 	private void execute() throws MipsException {
 	    int value;
 	    int preserved;
-	    
+
 	    switch (operation) {
 	    case Mips.ADD:
 		dst = src1 + src2;
@@ -911,17 +911,17 @@ public final class Processor {
 		break;
 	    case Mips.BGEZ:
 		branch = (src1 >= 0);
-		break;		
+		break;
 	    case Mips.BGTZ:
 		branch = (src1 > 0);
-		break;		
+		break;
 	    case Mips.BLEZ:
 		branch = (src1 <= 0);
-		break;		
+		break;
 	    case Mips.BLTZ:
 		branch = (src1 < 0);
 		break;
-		
+
 	    case Mips.JUMP:
 		break;
 
@@ -943,12 +943,12 @@ public final class Processor {
 
 	    case Mips.LOAD:
 		value = readMem(addr, size);
-		
+
 		if (!test(Mips.UNSIGNED))
 		    dst = Lib.extend(value, 0, size*8);
 		else
 		    dst = value;
-		
+
 		break;
 
 	    case Mips.LWL:
@@ -970,7 +970,7 @@ public final class Processor {
 		mask = -1 >>> preserved;	// preserved bits are 0 in mask
 		dst = value >>> preserved;	// shift input to correct place
 		addr &= ~0x3;
-		
+
 		break;
 
 	    case Mips.STORE:
@@ -1007,7 +1007,7 @@ public final class Processor {
 
 	    case Mips.UNIMPL:
 		System.err.println("Warning: encountered unimplemented inst");
-		
+
 	    case Mips.INVALID:
 		throw new MipsException(exceptionIllegalInstruction);
 
@@ -1050,7 +1050,7 @@ public final class Processor {
 		Lib.test(dbgFullDisassemble))
 		System.out.print("\n");
 	}
-    
+
 	// state used to execute a single instruction
 	int value, op, rs, rt, rd, sh, func, target, imm;
 	int operation, format, flags;
@@ -1059,7 +1059,7 @@ public final class Processor {
 	int size;
 	int addr, nextPC, jtarget, dstReg;
 	long src1, src2, dst;
-	int mask;	
+	int mask;
 	boolean branch;
     }
 
@@ -1071,7 +1071,7 @@ public final class Processor {
 	    this.operation = operation;
 	    this.name = name;
 	}
-	    
+
 	Mips(int operation, String name, int format, int flags) {
 	    this(operation, name);
 	    this.format = format;
@@ -1213,7 +1213,7 @@ public final class Processor {
 	    new Mips(),
 	    new Mips(),
 	    new Mips(),
-	    new Mips(),	    
+	    new Mips(),
 	};
 
 	static final Mips[] specialtable = {
